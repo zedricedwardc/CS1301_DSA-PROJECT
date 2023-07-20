@@ -1,19 +1,50 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <conio.h>
+#include <cstdlib>
+#include <algorithm> 
 
+#include "word_game.h"
+#include "FlappyBird.h"
+#include "dino_run.h"
+#include "MathsGame.h"
+#include "GuessNumberGame.h"
 
 using namespace std;
 
 struct Menu {
     list<string> games;
-    list<string> favoriteGames;
+    static list<string> favoriteGames;
+
+    void DinoGame()
+    {
+        setcursor(0, 0);
+
+        do {
+            system("cls");
+            gotoxy(10, 5); cout << " -------------------------- ";
+            gotoxy(10, 6); cout << " |        DINO RUN        | ";
+            gotoxy(10, 7); cout << " -------------------------- ";
+            gotoxy(10, 9); cout << "1. Start Game";
+            gotoxy(10, 10); cout << "2. Instructions";
+            gotoxy(10, 11); cout << "3. Quit";
+            gotoxy(10, 13); cout << "Select option: ";
+            char op;
+            cin >> op;
+
+            if (op == '1') play();
+            else if (op == '2') instructions();
+            else if (op == '3') break;
+
+        } while (1);
+    }
 
     void printGames() const {
         cout << "Available games:" << endl;
         int i = 1;
         for (const auto& game : games) {
-            cout << i << ". " << game << endl;
+            cout << "\t" << i << ". " << game << endl;
             i++;
         }
         cout << endl;
@@ -27,27 +58,61 @@ struct Menu {
             cout << "Favorite games:" << endl;
             int i = 1;
             for (const auto& game : favoriteGames) {
-                cout << i << ". " << game << endl;
+                cout << "\t"<<i << ". " << game << endl;
                 i++;
             }
         }
         cout << endl;
     }
 
-    void addFavoriteGame(int gameChoice) {
+    void addFavoriteGame(int gameChoice)
+    {
         auto it = games.begin();
         advance(it, gameChoice - 1);
-        favoriteGames.push_back(*it);
-        cout << "Game added to favorites." << endl;
+        const string& gameToAdd = *it;
+
+        // Check if the game is already in the favorite list
+        if (find(favoriteGames.begin(), favoriteGames.end(), gameToAdd) != favoriteGames.end()) {
+            cout << "Game is already in favorites." << endl;
+        }
+        else {
+            favoriteGames.push_back(gameToAdd);
+            cout << "Game added to favorites.\nAdd another Game?\n" << endl;
+        }
     }
 
     void removeFavoriteGame(int removeChoice) {
         auto it = favoriteGames.begin();
         advance(it, removeChoice - 1);
         favoriteGames.erase(it);
-        cout << "Favorite game removed." << endl;
+        cout << "Favorite game removed." << endl << "Delete more game to favorites?\n";
+    }
+
+    void playSelectedGame(const string& gameName) {
+        if (gameName == "WordGame") {
+            WordGame::playGame();
+        }
+        else if (gameName == "Flappy Bird") {
+            FlappyBird flappyBird;
+            flappyBird.Menu();
+        }
+        else if (gameName == "Dino Game") {
+            DinoGame();
+        }
+        else if (gameName == "Maths Game")
+        {
+            MathsGame MathsGame;
+            MathsGame.displayMainMenu();
+        }
+        else if (true)
+        {
+            GuessNumberGame GuessNumber;
+            GuessNumber.play();
+        }
     }
 };
+
+list<string> Menu::favoriteGames;
 
 int main() 
 {
@@ -55,84 +120,94 @@ int main()
     Menu menu;
     menu.games = {
         "WordGame",
-        "Game 2",
-        "Game 3",
-        "Game 4",
-        "Game 5",
-        "Game 6",
-        "Game 7",
-        "Game 8",
-        "Game 9",
-        "Game 10"
-    };
+        "Flappy Bird",
+        "Dino Game",
+        "Maths Game",
+        "Guess Number"
+        };
 
     while (true) {
-        cout << "Menu:" << endl;
-        cout << "1. Games" << endl;
-        cout << "2. Favorite Games" << endl;
-        cout << "3. Exit" << endl;
+        system("cls");
+        cout << "Main menu:" << endl;
+        cout << "\t[1] Games" << endl;
+        cout << "\t[2] Favorite Games" << endl;
+        cout << "\t[3] Exit" << endl;
 
         int choice;
         cout << "Enter your choice: ";
         cin >> choice;
-        system("cls");
         switch (choice) {
         case 1:
-            menu.printGames();
-            cout << "Whatgame do you want to play?:";
-            cin >> gameNumber;
-            switch (gameNumber)
-            {
-            case 1:  
-                break;
-            }
-
+            do {
+                system("cls");
+                menu.printGames();
+                cout << "What game do you want to play?(0 to cancel): ";
+                cin >> gameNumber;
+                if (gameNumber > 0 && gameNumber <= menu.games.size() && gameNumber < 6) {
+                    system("cls");
+                    auto it = menu.games.begin();
+                    advance(it, gameNumber - 1);
+                    menu.playSelectedGame(*it); // Play the selected game
+                }
+                else if (gameNumber == 0)
+                {
+                    return main();
+                }
+                else {
+                    cout << "Invalid game number." << endl;
+                }
+                
+            } while (gameNumber > 5);
             break;
+
         case 2:
             int tempChoice;
             do{
+                system("cls");
             menu.printFavoriteGames();
-            cout << "\n\t[1]Choose game to play.\n\t[2]add a game to favorites\n\t[3]remove a game to favorites\n\t[4]Exit\n\tChoose:";
+            cout << "\n\t[1]Choose game to play.\n\t[2]Add a game to favorites\n\t[3]Remove a game to favorites\n\t[4]Exit\n\tChoose: ";
             cin >> tempChoice;
+            system("cls");
             switch (tempChoice)
             {
                 case 1: 
-                    int tempfavchoice;
-                    do 
+                    do
                     {
                         menu.printFavoriteGames();
-                        cout << "\n\t[1]Choose game to play.[2]Exit\n\tChoose:";
-                        cin >> tempfavchoice;
-                        switch (tempfavchoice)
-                        {
-                            case 1:
-                                break;
-
-                            case 2:
-                                cout << "Exiting back to Main Menu....";
-                                system("pause");
-                                system("cls");
-                                break;
-                            default:
-                                cout << "Invalid input try again!!\n";
-                                break;
+                        cout << "What game do you want to play?(0 to cancel): ";
+                        cin >> gameNumber;
+                        if (gameNumber > 0 && gameNumber <= menu.games.size()) {
+                            system("cls");
+                            auto it = menu.favoriteGames.begin();
+                            advance(it, gameNumber - 1);
+                            menu.playSelectedGame(*it); // Play the selected game
+                            system("cls");
                         }
-                    } while (tempfavchoice != 1 || tempfavchoice != 2);
+                        else {
+                            system("cls");
+                            cout << "Invalid game number." << endl;
+                            system("pause");
+                        }
+                       
+                    } while (gameNumber <0);
                    
 
                     break;
                 case 2: 
                     int gameChoice;
                     do
-                    {
+                    {   
                         menu.printGames();
                         cout << "Enter the game number to add to favorites (0 to cancel): ";
                         cin >> gameChoice;
 
                         if (gameChoice > 0 && gameChoice <= menu.games.size()) {
+                            system("cls");
                             menu.addFavoriteGame(gameChoice);
+
                         }
                         else if (gameChoice != 0) {
+                            system("cls");
                             cout << "Invalid game number." << endl;
                         }
                     } while (gameChoice != 0);
@@ -148,31 +223,33 @@ int main()
                         cin >> removeChoice;
 
                         if (removeChoice > 0 && removeChoice <= menu.favoriteGames.size()) {
+                            system("cls");
                             menu.removeFavoriteGame(removeChoice);
                         }
                         else if (removeChoice != 0) {
+                            system("cls");
                             cout << "Invalid favorite game number." << endl;
                         }
                     } while (removeChoice != 0);
                     break;
                 }
                 case 4:
+                    system("cls");
                     return main();
                     break;
                 default:
-                    cout << "invalid choice returning to main menu";
+                    system("cls");
+                    cout << "Invalid choice returning to main menu";
                     system("pause");
                     break;
             }
             } while (tempChoice != 0);
             break;
-        case 3:
+        case 3:system("cls");
             cout << "Exiting program. Goodbye!" << endl;
             return 0;
-        default:
+        default:system("cls");
             cout << "Invalid choice. Please try again." << endl;
         }
-
-        cout << endl;
     }
 }
